@@ -27,6 +27,7 @@ class TodoApp:
         items = get_todos()
         for item in items:
             self.list_box.insert(tk.END, item)
+        self.list_box.bind('<<ListboxSelect>>', self.show_in_input_box)
 
         self.add_button = tk.Button(self.window, text="Add", command=self.add_todo)
         self.add_button.pack(**self.padding)
@@ -57,6 +58,12 @@ class TodoApp:
         for item in items:
             self.list_box.insert(tk.END, item)
 
+    def show_in_input_box(self, event):
+        selected_index = self.list_box.curselection()
+        selected_todo = self.list_box.get(selected_index)
+        self.input_box.delete(0, tk.END)
+        self.input_box.insert(0, selected_todo)
+
     def complete(self):
         index_to_complete = self.list_box.curselection()
         self.list_box.delete(index_to_complete)
@@ -64,7 +71,12 @@ class TodoApp:
         write_todos(todos)
 
     def edit(self):
-        self.open_popup("to be implemented...")
+        index_to_edit = self.list_box.curselection()
+        edited_todo = self.input_box.get()
+        todos = get_todos()
+        todos[index_to_edit[0]] = edited_todo
+        write_todos(todos)
+        self.reload_listbox()
 
     def open_popup(self, message):
         popup = tk.Toplevel(self.window)
@@ -88,4 +100,5 @@ class TodoApp:
 if __name__ == '__main__':
     todoapp = TodoApp()
     todoapp.run()
+
 
